@@ -140,7 +140,7 @@ def format_header(_signature: str, _flags: int, _total_size: int, _data_offset: 
 
 
 def format_entry(_kind: str, _data_offset: int, _data_size, _path: str) -> bytes:
-    assert _kind in ['f', 'd', 'l']
+    assert _kind in {'f', 'd', 'l'}
     assert 0 <= _data_offset < U32_MAX
     assert 0 <= _data_size < U32_MAX
     assert 0 < len(_path) < U16_MAX
@@ -217,12 +217,10 @@ def get_intermediate_paths(path: str) -> List[str]:
     _parts = []
     if path == '/':
         return _parts
-    if path.endswith('/'):
-        path = path[:-1]
-
+    path = path.removesuffix('/')
     while True:
         dirname, _ = posixpath.split(path)
-        if dirname != '.' and dirname != '/':
+        if dirname not in ['.', '/']:
             _parts.append(dirname)
         else:
             break
@@ -285,8 +283,8 @@ if args.infile:
     except Exception as e:
         parser.error(f'{e}')
 
-paths = dict()  # type: Dict[str, (Directive, int)] # image path -> (directive, data_offset)
-files = dict()  # type: Dict[str, int] # source file -> data_offset
+paths = {}
+files = {}
 dir_set = set()  # type: Set[str] # all intermediate directories
 metadata_size = 0
 curr_data_offset = 0
